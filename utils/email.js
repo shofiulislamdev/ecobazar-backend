@@ -27,4 +27,21 @@ let mailVerification = async (token, email)=>{
     }
 }
 
-module.exports = {mailVerification}
+let resetPasswordMail = async (token, email)=>{
+    try {
+        const info = await transporter.sendMail({
+            from: 'emnishofiulislam@gmail.com', // sender address
+            to: email, // list of recipients
+            subject: "Please Reset Your Password", // subject line
+            html: `<body style=margin:0;padding:0;font-family:Arial,sans-serif;background-color:#f4f4f4><table align=center cellpadding=0 cellspacing=0 style=max-width:600px;background:#fff;margin-top:30px;border-radius:8px;overflow:hidden width=100%><tr><td style=background-color:#28a745;padding:20px;text-align:center;color:#fff><h1 style=margin:0>EcoBazar</h1><p style="margin:5px 0 0">Fresh & Organic Products<tr><td style=padding:30px><h2 style=margin-top:0>Reset Your Password</h2><p>Hello <strong>User</strong>,<p>We received a request to reset your password. Click the button below to set a new password:<p style="text-align:center;margin:30px 0"><a href="http://localhost:5173/resetpassword/${token}" style="background-color:#28a745;color:#fff;padding:12px 25px;text-decoration:none;border-radius:5px;font-size:16px">Reset Password</a><p>If the button above doesn’t work, copy and paste this link into your browser:<p style=word-break:break-all;color:#555>http://localhost:5173/resetpassword/${token}<p style=color:#d9534f>⚠️ This link will expire in 30 minutes.<p>If you didn’t request a password reset, you can safely ignore this email.<p>Thanks,<br><strong>EcoBazar Team</strong><tr><td style=background-color:#f1f1f1;padding:15px;text-align:center;font-size:12px;color:#777><p style=margin:0>© 2026 EcoBazar. All rights reserved.<p style="margin:5px 0 0">Dhaka, Bangladesh</table>`, // HTML body
+        });
+
+        console.log("Message sent: %s", info.messageId);
+        // Preview URL is only available when using an Ethereal test account
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    } catch (err) {
+        console.error("Error while sending mail:", err);
+    }
+}
+
+module.exports = {mailVerification, resetPasswordMail}
