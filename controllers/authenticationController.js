@@ -5,6 +5,7 @@ const { emptyFieldValidation } = require("../utils/validation")
 const tokenGenerator = require("../utils/tokenGenerator")
 const existingData = require("../utils/exixtingData")
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 let registrationController = async (req, res) => {
     const { email, password, confirmPassword, terms } = req.body
@@ -50,7 +51,8 @@ let loginController = async (req, res) => {
     const { email, password } = req.body
 
 
-    let users = await existingData(res, { email: email })
+    let users = await User.findOne({ email: email })
+
     if (!users) {
         return res.send({ message: "User not found" })
     }
@@ -74,7 +76,7 @@ let forgotPasswordController = async (req, res) => {
 
     emptyFieldValidation(res, email)
 
-    let users = await existingData(res, { email: email })
+    let users = await User.findOne({ email: email })
     if (!users) {
         return res.send({ message: "User not found" })
     }
@@ -97,14 +99,15 @@ let resetPasswordController = (req, res) => {
         return res.send({ message: "Confirm password not matched" })
     }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async function (err, decoded) {
         if (err) {
             res.send({ message: "Unauthorized" })
         } else {
             const hash = bcrypt.hashSync(newPassword, 10);
-            const updateData = User.findByIdAndUpdate({ _id: decoded.id }, { password: newPassword })
+            console.log(decoded)
+            const updateData = await User.findByIdAndUpdate({ _id: decoded.id }, { password: hash }, { new: true })
 
-            res.send({ message: "Password Updated" })
+            res.send({ message: "Password Updated", updateData })
         }
     });
 }
@@ -122,7 +125,28 @@ let resendVerificationEmailController = async (req, res) => {
 
     mailVerification(token, email)
 
-    res.send({message: "Check your email for verification"})
+    res.send({ message: "Check your email for verification" })
 }
 
-module.exports = { registrationController, loginController, forgotPasswordController, resetPasswordController, resendVerificationEmailController }
+let verifyEmailController = async (req, res) => {
+    const { token } = req.params
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async function (err, decoded) {
+        if (err) {
+            res.send({ message: "Unauthorized" })
+        } else {
+            const userId = decoded.id
+            let findUser = await User.findById(userId)
+
+            if (findUser.isVerified) {
+                return res.send({ message: "User already verified" })
+            } else {
+                findUser.isVerified = true
+                findUser.save()
+                res.send({ message: "Email verified successfully" })
+            }
+        }
+    })
+}
+
+module.exports = { registrationController, loginController, forgotPasswordController, resetPasswordController, resendVerificationEmailController, verifyEmailController }
