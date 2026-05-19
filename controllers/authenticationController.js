@@ -13,17 +13,26 @@ let registrationController = async (req, res) => {
 
     let users = await existingData(res, { email: email })
     if (users) {
-        return res.send({ message: "User exist" })
+        return res.send({
+            success: false,
+            message: "User exist"
+        })
     }
 
     if (!terms) {
-        return res.send({ message: "Please Accept Our Terms and Condition" })
+        return res.send({
+            success: false,
+            message: "Please Accept Our Terms and Condition"
+        })
     }
 
     emptyFieldValidation(res, email, password, confirmPassword)
 
     if (password !== confirmPassword) {
-        return res.send({ message: "password no matched" })
+        return res.send({
+            success: false,
+            message: "password no matched"
+        })
     }
 
     const hash = bcrypt.hashSync(password, 10);
@@ -34,7 +43,7 @@ let registrationController = async (req, res) => {
         terms: terms
     })
 
-    user.save()
+    await user.save()
 
 
     let token = tokenGenerator({
@@ -44,7 +53,10 @@ let registrationController = async (req, res) => {
 
     mailVerification(token, email)
 
-    res.send({ message: "Registration Successfull" })
+    res.send({
+        success: true, 
+        message: "Registration Successfull, Please check your email for verification" 
+    })
 }
 
 let loginController = async (req, res) => {
@@ -54,7 +66,10 @@ let loginController = async (req, res) => {
     let users = await User.findOne({ email: email })
 
     if (!users) {
-        return res.send({ message: "User not found" })
+        return res.send({
+            success: false, 
+            message: "User not found" 
+        })
     }
 
     emptyFieldValidation(res, email, password)
@@ -62,10 +77,14 @@ let loginController = async (req, res) => {
     let pass = bcrypt.compareSync(password, users.password);
 
     if (!pass) {
-        return res.send({ message: "Invalid Credential" })
+        return res.send({ 
+            success: false,
+            message: "Invalid Credential" 
+        })
     }
 
     res.send({
+        success: true,
         message: "Login Successfull"
     })
 
@@ -78,7 +97,10 @@ let forgotPasswordController = async (req, res) => {
 
     let users = await User.findOne({ email: email })
     if (!users) {
-        return res.send({ message: "User not found" })
+        return res.send({
+            success: false, 
+            message: "User not found" 
+        })
     }
 
     let token = tokenGenerator({
@@ -88,7 +110,10 @@ let forgotPasswordController = async (req, res) => {
 
     resetPasswordMail(token, email)
 
-    res.send({ message: "Please check your email" })
+    res.send({
+        success: true, 
+        message: "Please check your email" 
+    })
 }
 
 let resetPasswordController = (req, res) => {
@@ -96,7 +121,10 @@ let resetPasswordController = (req, res) => {
     let { token } = req.params
 
     if (newPassword !== confirmPassword) {
-        return res.send({ message: "Confirm password not matched" })
+        return res.send({
+            success: false, 
+            message: "Confirm password not matched" 
+        })
     }
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async function (err, decoded) {
@@ -107,7 +135,10 @@ let resetPasswordController = (req, res) => {
             console.log(decoded)
             const updateData = await User.findByIdAndUpdate({ _id: decoded.id }, { password: hash }, { new: true })
 
-            res.send({ message: "Password Updated", updateData })
+            res.send({
+                success: true, 
+                message: "Password Updated", updateData 
+            })
         }
     });
 }
@@ -125,7 +156,10 @@ let resendVerificationEmailController = async (req, res) => {
 
     mailVerification(token, email)
 
-    res.send({ message: "Check your email for verification" })
+    res.send({
+        success: true, 
+        message: "Check your email for verification" 
+    })
 }
 
 let verifyEmailController = async (req, res) => {
@@ -143,7 +177,10 @@ let verifyEmailController = async (req, res) => {
             } else {
                 findUser.isVerified = true
                 findUser.save()
-                res.send({ message: "Email verified successfully" })
+                res.send({
+                    success: true, 
+                    message: "Email verified successfully" 
+                })
             }
         }
     })
