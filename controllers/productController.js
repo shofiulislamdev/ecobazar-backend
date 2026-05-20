@@ -7,7 +7,7 @@ const createProductController = async (req, res) => {
 
     // title exists ase naki
 
-    let sku = `${Date.now()}-${Date.getFullYear()}`
+    let sku = `${Date.now()}-${new Date().getFullYear()}`
 
     // sku exists ase naki
 
