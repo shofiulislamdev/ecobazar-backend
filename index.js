@@ -2,10 +2,11 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const multer = require('multer')
 const dbConfig = require('./config/dbConfig')
 const { registrationController, loginController, forgotPasswordController, resetPasswordController, resendVerificationEmailController, verifyEmailController } = require('./controllers/authenticationController')
 const { getAllUsersController, singleUserDataController, deleteUserController, updateUserController } = require('./controllers/userController')
-const { createProductController, getAllProductsController, singleProductDataController, deleteProductController, updateProductController } = require('./controllers/productController')
+const { createProductController, getProductController, getSingleProductController, productDeleteController, productUpdateController } = require('./controllers/productController')
 
 // const { rateLimit } = require('express-rate-limit')
 // const limiter = rateLimit({
@@ -18,6 +19,18 @@ const { createProductController, getAllProductsController, singleProductDataCont
 // app.use(limiter)
 
 
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads/products');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + "-" + file.originalname);
+    },
+});
+
+const upload = multer({ storage: storage });
 
 
 // Middleware
@@ -35,12 +48,12 @@ app.post('/resendverificationemail', resendVerificationEmailController)
 app.post('/verifyemail/:token', verifyEmailController)
 
 //Product Create
-app.post('/createproduct', createProductController)
+app.post('/createproduct', upload.array('photos', 5), createProductController)
 
-app.get('/allproducts', getAllProductsController)
-app.get('/singleproduct/:id', singleProductDataController)
-app.delete('/deleteproduct/:id', deleteProductController)
-app.post('/updateproduct/:id', updateProductController)
+app.get('/allproduct', getProductController)
+app.get('/singleproduct/:id', getSingleProductController)
+app.delete('/deleteproduct/:id', productDeleteController)
+app.post('/updateproduct/:id', upload.array('photos', 5), productUpdateController)
 
 // Order Management
 

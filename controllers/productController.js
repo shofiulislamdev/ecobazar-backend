@@ -42,40 +42,91 @@ const createProductController = async (req, res) => {
 
 // all product get
 
-let getAllProductsController = async (req, res) => {
-    let productData = await Product.find({})
-    res.send({
-        message: "All Product Data",
-        productData
-    })
+const getProductController = async (req, res) => {
+    try {
+        let product = await Product.find({})
+
+        res.json({
+            success: true,
+            message: "All Product Data",
+            product
+        })
+    } catch (error) {
+        res.json({
+            success: false,
+            message: "Server Error"
+        })
+    }
 }
+
+
 
 // single product get
-let singleProductDataController = async (req, res) => {
-    let { id } = req.params
-    let productData = await Product.findById(id)
-    res.send({
-        message: `${productData.title} data`,
-        productData
-    })
+
+const getSingleProductController = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const singleProduct = await Product.findOne({ _id: id })
+        // let productData = await Product.findById(id) 
+
+        res.json({
+            success: true,
+            message: `${singleProduct.title} data`,
+            singleProduct
+        })
+    } catch (error) {
+        res.json({
+            success: false,
+            message: "Server Error"
+        })
+    }
 }
+
+
+
 
 // product delete
-let deleteProductController = async (req, res) => {
-    let { id } = req.params
-    let productData = await Product.findByIdAndDelete(id)
-    res.send({
-        message: "Product Deleted"
-    })
+
+const productDeleteController = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        await Product.findByIdAndDelete(id)
+
+        res.json({
+            success: true,
+            message: "Product Deleted"
+        })
+    } catch (error) {
+        res.json({
+            success: false,
+            message: "Server Error"
+        })
+    }
 }
+
+
+
 
 // product update
-let updateProductController = async (req, res) => {
-    let { id } = req.params
-    let productData = await Product.findByIdAndUpdate({ _id: id }, req.body, { new: true })
-    res.send({
-        message: "Product Updated"
-    })
+
+const productUpdateController = async (req, res) => {
+    try {
+        const { id } = req.params
+        const productUpdate = await Product.findByIdAndUpdate({ _id: id }, req.body)
+
+        res.json({
+            success: true,
+            message: "Product Updated"
+        })
+    } catch (error) {
+        res.json({
+            success: false,
+            message: "Server Error"
+        })
+    }
 }
 
-module.exports = { createProductController, getAllProductsController, singleProductDataController, deleteProductController, updateProductController }
+
+module.exports = { createProductController, getProductController, getSingleProductController, productDeleteController, productUpdateController }
