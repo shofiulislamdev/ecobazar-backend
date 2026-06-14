@@ -9,6 +9,7 @@ const { getAllUsersController, singleUserDataController, deleteUserController, u
 const { createProductController, getProductController, getSingleProductController, productDeleteController, productUpdateController } = require('./controllers/productController')
 
 const axios = require('axios')
+const { createCart, increDecre, getCart, proDelete } = require('./controllers/cartController')
 
 // const { rateLimit } = require('express-rate-limit')
 // const limiter = rateLimit({
@@ -62,7 +63,7 @@ app.post('/payment', async function (req, res) {
 
     const asd = req.body
 
-    let data = await axios.post('https://sandbox.aamarpay.com/jsonpost.php',{
+    let data = await axios.post('https://sandbox.aamarpay.com/jsonpost.php', {
         store_id: "aamarpaytest",
         signature_key: "dbb74894e82415a2f7ff0ec3a97e4183",
         ...req.body,
@@ -77,6 +78,12 @@ app.post('/payment', async function (req, res) {
     res.send(data.data)
 
 })
+
+// Cart Management
+app.post('/cart/create', createCart)
+app.post('/cart/update/:id', increDecre)
+app.get('/cart/:userId', getCart)
+app.delete('/cart/:id', proDelete)
 
 // Order Management
 
