@@ -1,3 +1,4 @@
+// require('node:dns').setServers(['1.1.1.1','8.8.8.8'])
 require('dotenv').config()
 const express = require('express')
 const app = express()
@@ -22,7 +23,7 @@ const { createCart, increDecre, getCart, proDelete } = require('./controllers/ca
 // app.use(limiter)
 
 
-
+// image work
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './uploads/products');
