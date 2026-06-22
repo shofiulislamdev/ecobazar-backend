@@ -82,7 +82,7 @@ app.post('/payment', async function (req, res) {
 
 // Cart Management
 app.post('/cart/create', createCart)
-app.post('/cart/update/:id', increDecre)
+app.post('/cart/update/:id/:userid', increDecre)
 app.get('/cart/:userId', getCart)
 app.delete('/cart/:id', proDelete)
 

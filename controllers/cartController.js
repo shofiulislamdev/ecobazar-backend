@@ -38,10 +38,11 @@ const createCart = async (req, res) => {
 
 
 const increDecre = async (req, res) => {
-    const { id } = req.params
+    const { id, userid } = req.params
+    // ekhane id holo product er id, userid holo user er id
     const { type } = req.body
 
-    const cart = await Cart.findOne({ product: id })
+    const cart = await Cart.findOne({ product: id, user: userid })
     const product = await Product.findOne({ _id: id })
     console.log(product)
 
