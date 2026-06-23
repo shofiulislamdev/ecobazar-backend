@@ -33,11 +33,12 @@ const paymentController = async (req, res) => {
         // })
 
 
+        const tranId = Date.now()
         const response = await axios.post(
             'https://sandbox.aamarpay.com/jsonpost.php',
             {
                 store_id: 'aamarpaytest',
-                tran_id: Date.now(),
+                tran_id: tranId,
                 success_url: 'http://www.merchantdomain.com/successpage.html',
                 fail_url: 'http://www.merchantdomain.com/failedpage.html',
                 cancel_url: 'http://www.merchantdomain.com/cancelpage.html',
@@ -68,7 +69,7 @@ const paymentController = async (req, res) => {
             user: userId,
             products: pro,
             totalPrice: totalPrice,
-            tranid: "646565465485"
+            tranid: tranId
         })
 
         await order.save()
