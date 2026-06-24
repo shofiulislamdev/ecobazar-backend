@@ -11,7 +11,7 @@ const { createProductController, getProductController, getSingleProductControlle
 
 const axios = require('axios')
 const { createCart, increDecre, getCart, proDelete } = require('./controllers/cartController')
-const { paymentController } = require('./controllers/paymentController')
+const { paymentController, getAllOrdersController } = require('./controllers/paymentController')
 
 // const { rateLimit } = require('express-rate-limit')
 // const limiter = rateLimit({
@@ -71,6 +71,7 @@ app.delete('/cart/:id', proDelete)
 
 // Order Management
 app.post('/payment', paymentController)
+app.get('/getorders/:userid', getAllOrdersController)
 
 // user management
 app.get('/allusers', getAllUsersController)
